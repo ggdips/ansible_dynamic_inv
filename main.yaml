@@ -1,0 +1,45 @@
+---
+ - hosts: hosts
+   become: true
+   become_user: root
+   gather_facts: yes
+
+   tasks:
+   - name: Switch to root
+     set_fact:
+       ansible_ssh_user: root
+       ansible_ssh_pass: ""
+       ansible_sudo_pass: ""
+       ansible_user: root
+
+   - name: copy somefile root
+     copy:
+       src: ./somefile
+       dest: /tmp/somefile
+       owner: root
+       group: root
+       mode: 0644
+
+   - name: Add host to group 'just_created'
+     add_host:
+       name: 'host1.example.xom'
+       groups: just_created
+       ansible_ssh_user: someuser
+       ansible_ssh_pass: ""
+       ansible_sudo_pass: ""
+       ansible_user: someuser
+
+ - hosts: just_created
+   become: true
+   become_user: root
+   gather_facts: yes
+
+   tasks:
+   - name: copy otherfile someuser
+     copy:
+       src: ./otherfile
+       dest: /tmp/other
+       owner: root
+       group: root
+       mode: 0644
+
